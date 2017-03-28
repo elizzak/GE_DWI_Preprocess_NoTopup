@@ -1,0 +1,108 @@
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSPY v2004 rel. 3 U (http://www.xmlspy.com) by Mohana Ramaratnam (Washington University) -->
+<Pipeline xmlns="http://nrg.wustl.edu/pipeline" xmlns:fileUtils="http://www.xnat.org/java/org.nrg.imagingtools.utils.FileUtils"
+	xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://nrg.wustl.edu/pipeline ..\schema\pipeline.xsd">
+	<name>Arash_DWIpreprocessing</name>
+	<!--Should be  Name of the pipeline XML file -->
+	<location>/data/xnat/pipeline/MCWpipelines/Arash/Arash_DWIpreprocessing</location>
+	<!-- Filesystem path to the pipeline XML -->
+	<description>Launches the DWI preprocessing pipeline on the cluster.</description>
+	<documentation>
+		<authors>
+			<author>
+				<lastname>Zakszewski</lastname>
+				<firstname>Liz</firstname>
+			</author>
+		</authors>
+		<version>1</version>
+		<input-parameters>
+			<parameter>
+				<name>subject</name>
+				<values>
+					<schemalink>xnat:imageSessionData/subject_ID</schemalink>
+				</values>
+				<description>Subject ID</description>
+			</parameter>
+			<parameter>
+				<name>subjName</name>
+				<values>
+					<schemalink>xnat:imageSessionData/dcmPatientName</schemalink>
+				</values>
+				<description>Subject name from DICOM</description>
+			</parameter>
+			<parameter>
+				<name>sessionDate</name>
+				<values>
+					<schemalink>xnat:imageSessionData/date</schemalink>
+				</values>
+				<description>The date of acquisition for the session</description>
+			</parameter>
+                        <parameter>
+                                <name>sessionId</name>
+                                <values><schemalink>xnat:imageSessionData/label</schemalink></values>
+                                <description>The session id  of the session</description>
+                        </parameter>
+        	</input-parameters>
+	</documentation>
+	<outputFileNamePrefix>^concat(/Pipeline/parameters/parameter[name='logdir']/values/unique/text(),'/',/Pipeline/parameters/parameter[name="label"]/values/unique/text())^</outputFileNamePrefix>
+	<parameters>
+		<parameter>
+			<name>xnat_id</name>
+			<values>
+				<unique>^Pipeline/parameters/parameter[name="id"]/values/unique/text()^</unique>
+			</values>
+			<description>The XNAT ID (Accession Number) of the session</description>
+		</parameter>
+		<parameter>
+			<name>sessionId</name>
+			<values>
+				<unique>^Pipeline/parameters/parameter[name="label"]/values/unique/text()^</unique>
+			</values>
+			<description>The session id  of the session</description>
+		</parameter>
+		<parameter>
+			<name>workdir</name>
+			<values>
+				<unique>^concat(/Pipeline/parameters/parameter[name='builddir']/values/unique/text(),'/',/Pipeline/parameters/parameter[name='sessionId']/values/unique/text())^</unique>
+			</values>
+		</parameter>
+		<parameter>
+			<name>logdir</name>
+			<values>
+				<unique>/data/xnat/pipeline/MCWlogs</unique>
+			</values>
+		</parameter>
+	</parameters>
+	<!-- Description of the Pipeilne -->
+	<steps>
+                <step description="SpawnCluster" id="Cluster">
+                        <resource location="MCWdescriptors" name="GE_DWI_Preproc_SwitchUser">
+                             <argument id="BaseDir">
+                                  <value>"/data/xnat/remotebuild/"</value>
+                             </argument>
+                             <argument id="user">
+                                  <value>^/Pipeline/parameters/parameter[name='user']/values/unique/text()^</value>
+                             </argument>
+                             <argument id="password">
+                                  <value>^/Pipeline/parameters/parameter[name='pwd']/values/unique/text()^</value>
+                             </argument>
+                             <argument id="NoTopup"/>  
+                             <argument id="addr"><value>^/Pipeline/parameters/parameter[name='host']/values/unique/text()^</value></argument>
+                             <argument id="proj"><value>^/Pipeline/parameters/parameter[name='project']/values/unique/text()^</value></argument>
+                             <argument id="exp"><value>^/Pipeline/parameters/parameter[name='sessionId']/values/unique/text()^</value></argument>
+                             <argument id="subj"><value>^/Pipeline/parameters/parameter[name='subject']/values/unique/text()^</value></argument>                           
+                             <argument id="supDir">
+                                  <value>"/data/xnat/pipeline/MCWbin/ClusterJobs/GE_DWI_Preprocess/"</value>
+                             </argument>
+                             <argument id="AP"><value>'DTI 2mm'</value></argument>
+                            <!--   <argument id="PA"><value>'SB DTI MCW P/A'</value></argument>                
+                             <argument id="Verbose"/>  -->
+                             <argument id="AcFile"><value>'acqparams.txt'</value></argument>             
+                        </resource>
+                </step>
+	</steps>
+</Pipeline>
+Contact GitHub API Training Shop Blog About
+© 2017 GitHub, Inc. Terms Privacy Security Status Help
